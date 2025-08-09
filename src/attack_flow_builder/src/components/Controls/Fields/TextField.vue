@@ -61,8 +61,7 @@ export default defineComponent({
     },
     featuredOptions: {
       type: Set as PropType<Set<string>>,
-      required: false,
-      default: undefined
+      required: false
     }
   },
   data() {
@@ -90,11 +89,21 @@ export default defineComponent({
       const v = this.value.toLocaleLowerCase();
       for(const [value, prop] of optionsProp.value) {
         const text = prop.toString();
-        const feat = !fo || fo.has(value);
-        if(feat && text.toLocaleLowerCase().includes(v)) {
-          options.push({ value, text, feature: true });
+        const feat = fo ? fo.has(value) : true;
+        if(text.toLocaleLowerCase().includes(v)) {
+          options.push({ value, text, feature: feat });
         }
       }
+      // Sort suggestions
+      options.sort((a,b) => {
+        if(a.feature && !b.feature) {
+          return -1;
+        } else if(!a.feature && b.feature) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
       return options;
     },
 
